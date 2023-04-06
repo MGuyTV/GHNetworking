@@ -26,7 +26,7 @@ public class TheServer {
     private static Object lock = new Object();
     private static Object lock2 = new Object();
     private boolean bool = false;
-    public MyServer(int port){
+    public TheServer(int port){
         try {
             server = new ServerSocket(port);
             System.out.println("Server started");
@@ -219,7 +219,7 @@ public class TheServer {
     public static void main(String args[]) 
     { 
 
-        MyServer server = new MyServer(Integer.parseInt(args[0]));//Port number is given by a comman line argument
+        TheServer server = new TheServer(Integer.parseInt(args[0]));//Port number is given by a comman line argument
         
     }
     

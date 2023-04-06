@@ -26,7 +26,7 @@ public class TheClient{
     //make a thread that checks for input
     //make another thread that is ready to send output at anytime
 
-    public MyClient(String address, int port){
+    public TheClient(String address, int port){
 
         try {
             socket = new Socket(address, port);
@@ -89,7 +89,7 @@ public class TheClient{
 
     public static void main(String args[]){
 
-        MyClient client = new MyClient("localhost", Integer.parseInt(args[0]));//Port number is given by a command line argument
+        TheClient client = new TheClient("localhost", Integer.parseInt(args[0]));//Port number is given by a command line argument
 	}
     
     

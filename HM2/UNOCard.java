@@ -1,7 +1,6 @@
 public class UNOCard{
 	private String cardColor = "";
 	private int cardNumber = 0;
-	private String cardName = "";
 
 
 	public UNOCard(String cardColor, int cardNumber){
@@ -25,17 +24,11 @@ public class UNOCard{
 		this.cardNumber = number;
 	}
 	
-	public String getName(){
-		return this.cardName;
-	}
-
-	public void setName(String name){
-		this.cardName = name;
-	}
 
 	@Override
 	public String toString(){
-		return String.valueOf("Color: %S, Number: %d", cardColor, cardNumber);
+		//return String.valueOf("Color: %s, Number: %d", cardColor, cardNumber);
+		return "Color: " + cardColor + ", Number: " + cardNumber;
 	}
 
 
