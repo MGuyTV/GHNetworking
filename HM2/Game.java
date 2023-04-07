@@ -1,3 +1,4 @@
+import java.util.Scanner;
 public class Game{
 	/*In this project I was originally going to implement, but I decided to implement a 
 	  hybrid game between UNO and a style of the game of 21
@@ -16,13 +17,34 @@ public class Game{
 	private UNODeck deck;
 	private Player player1;
 	private Player player2;
-	public Game(/*Player player1, Player player2*/){
+	public Game(Player player1, Player player2){
 		deck = new UNODeck();
-		//playTheGame()
+		//System.out.println(deck.toString());
+		//playTheGame(deck, player1, player2)
+	}
+
+	public String playTheGame(UNODeck deck, Player player1, Player player2){//Will return the outcome of the game in a string
+		Scanner scanner = new Scanner(System.in);
+		while(true){
+
+			if(player1.getScore() >= 21)
+				return "Player 1 wins!";//Do it like this so the server can directly get the output of who wins.
+			if(player2.getScore() >= 21)
+				return "Player 2 wins!";
+
+		}
+
 	}
 
 	public UNODeck getDeck(){
 		return this.deck;
+	}
+
+	public static void main(String[] args){
+		Player player1 = new Player("Matt");
+		Player player2 = new Player("Garret");
+		Game game = new Game(player1, player2);
+		print(game.playTheGame());
 	}
 
 	//@Override

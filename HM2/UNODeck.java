@@ -13,8 +13,8 @@ public class UNODeck{
 
 	}
 
-	public UNOCard[] getDeck(){
-		return this.unoCardArray;
+	public UNOCard getValueAt(int num){
+		return this.unoCardArray[num];
 	}
 
 	public void setDeck(UNOCard[] array){//I doubt I'll even use this, but lets put it in here just for convention
@@ -43,7 +43,7 @@ public class UNODeck{
 	public String toString(){//We can modify this later to look nicer
 		String string = "";
 		for(UNOCard card : this.unoCardArray){
-			string = card.toString() + "\n";
+			string += card.toString() + "\n";
 		}
 		return string;
 	}

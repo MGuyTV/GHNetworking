@@ -220,6 +220,7 @@ public class TheServer {
     { 
 
         TheServer server = new TheServer(Integer.parseInt(args[0]));//Port number is given by a comman line argument
+        //there should be a game instance variable, and you should construct and call the game here
         
     }
     
