@@ -23,16 +23,15 @@ public class Game{
 		//playTheGame(deck, player1, player2)
 	}
 
-	public String playTheGame(UNODeck deck, Player player1, Player player2){//Will return the outcome of the game in a string
-		Scanner scanner = new Scanner(System.in);
-		while(true){
+	public String checkWinCondition(UNODeck deck, Player player1, Player player2){//Will return the outcome of the game in a string
 
 			if(player1.getScore() >= 21)
 				return "Player 1 wins!";//Do it like this so the server can directly get the output of who wins.
 			if(player2.getScore() >= 21)
 				return "Player 2 wins!";
+			return "No winner yet";
 
-		}
+	
 
 	}
 
@@ -43,8 +42,12 @@ public class Game{
 	public static void main(String[] args){
 		Player player1 = new Player("Matt");
 		Player player2 = new Player("Garret");
+		UNODeck deck = new UNODeck();
+		Scanner scnr = new Scanner(System.in);
 		Game game = new Game(player1, player2);
-		print(game.playTheGame());
+		while(game.checkWinCondition(deck, player1, player2) == "No winner yet"){
+			String line = scnr.nextLine();
+		}
 	}
 
 	//@Override

@@ -14,6 +14,7 @@
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.concurrent.*;
 
 public class TheServer {
     private ArrayList<String> client_names = new ArrayList<String>();//max 5 users?
@@ -21,11 +22,15 @@ public class TheServer {
     private Socket socket = null;
     private ServerSocket server = null;
     private Thread thread = null;
+    private Object gameLock = new Object();//only 1 player should be able to access a player object at any given time
 
     private static int synchronized_counter = -1;
     private static Object lock = new Object();
     private static Object lock2 = new Object();
     private boolean bool = false;
+    private static Game game;
+    private Player myPlayer;//This player's player object
+    private static ArrayBlockingQueue<Player> playerQueue = new ArrayBlockingQueue<Player>(2);
     public TheServer(int port){
         try {
             server = new ServerSocket(port);
@@ -52,6 +57,9 @@ public class TheServer {
 
     }
 
+    public void addPlayertoQueue(Player player){
+        playerQueue.put(player);
+    }
  
 
     public void writeToOtherClients(Socket mySocket, String string){//This method should output the message a client wrote
@@ -221,6 +229,20 @@ public class TheServer {
 
         TheServer server = new TheServer(Integer.parseInt(args[0]));//Port number is given by a comman line argument
         //there should be a game instance variable, and you should construct and call the game here
+        if(playerQueue.size() == 2){
+            synchronized(gameLock){
+                Game game = new Game(playerQueue.take(), playerQueue.take());
+
+            }
+            while(true){
+                synchronized(gameLock){
+                if(game.checkWinCondition(player1, player2) != "No winner yet")
+                    break;
+
+                }
+            }
+
+        }
         
     }
     
