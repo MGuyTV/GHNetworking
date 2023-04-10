@@ -22,7 +22,7 @@ public class TheServer {
     private Socket socket = null;
     private ServerSocket server = null;
     private Thread thread = null;
-    private Object gameLock = new Object();//only 1 player should be able to access a player object at any given time
+    private static Object gameLock = new Object();//only 1 player should be able to access a player object at any given time
 
     private static int synchronized_counter = -1;
     private static Object lock = new Object();
@@ -31,6 +31,7 @@ public class TheServer {
     private static Game game;
     private Player myPlayer;//This player's player object
     private static ArrayBlockingQueue<Player> playerQueue = new ArrayBlockingQueue<Player>(2);
+    private static ArrayBlockingQueue<String> ifWinQueue = new ArrayBlockingQueue<String>(1);
     public TheServer(int port){
         try {
             server = new ServerSocket(port);
@@ -58,7 +59,12 @@ public class TheServer {
     }
 
     public void addPlayertoQueue(Player player){
-        playerQueue.put(player);
+        try{
+            playerQueue.put(player);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
  
 
@@ -226,26 +232,38 @@ public class TheServer {
 
     public static void main(String args[]) 
     { 
+        try{
+            TheServer server = new TheServer(Integer.parseInt(args[0]));//Port number is given by a comman line argument
+            //there should be a game instance variable, and you should construct and call the game here
+            Player player1 = null;
+            Player player2 = null;
 
-        TheServer server = new TheServer(Integer.parseInt(args[0]));//Port number is given by a comman line argument
-        //there should be a game instance variable, and you should construct and call the game here
-        if(playerQueue.size() == 2){
-            synchronized(gameLock){
-                Game game = new Game(playerQueue.take(), playerQueue.take());
+            while(true){//true until there is a winner
+                if(playerQueue.size() == 2){//Wait until both players have enqueued their player objects into the playerQueue
+                    synchronized(gameLock){
+                        player1 = playerQueue.take();
+                        player2 = playerQueue.take();
+                        game = new Game(player1, player2);
 
-            }
-            while(true){
-                synchronized(gameLock){
-                if(game.checkWinCondition(player1, player2) != "No winner yet")
-                    break;
+                    }
+                    
+                    synchronized(gameLock){//We should output checkwincondition into another variable
+                        if(game.checkWinCondition(player1, player2) != "No winner yet"){//If there was a winner
+                            ifWinQueue.put(game.checkWinCondition(player1, player2));//Only one player's server needs to
+                                                                                     //broadcast this message
+                            break;
+                        }
 
+                    }
                 }
+
             }
 
+        }catch(Exception e){
+            e.printStackTrace();
         }
+
         
     }
-    
-    
     
 }

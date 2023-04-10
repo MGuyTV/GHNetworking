@@ -30,7 +30,7 @@ private String response;
 		this.response = response;
 	}
 
-	public void add(int num, String response)
+	public void add(int num, String response){
 		if(response == "yellow"){
 			this.setScore(num + 1);
 			return;
@@ -50,7 +50,7 @@ private String response;
 			this.setScore(num + 15);
 			return;
 		}
-		
+	}
 
 	@Override
 	public String toString(){
