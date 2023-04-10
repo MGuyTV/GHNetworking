@@ -15,6 +15,7 @@ import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.concurrent.*;
+import java.security.SecureRandom;
 
 public class TheServer {
     private ArrayList<String> client_names = new ArrayList<String>();//max 5 users?
@@ -29,7 +30,7 @@ public class TheServer {
     private static Object lock2 = new Object();
     private boolean bool = false;
     private static Game game;
-    private Player myPlayer;//This player's player object
+   // private Player myPlayer;//This player's player object
     private static ArrayBlockingQueue<Player> playerQueue = new ArrayBlockingQueue<Player>(2);
     private static ArrayBlockingQueue<String> ifWinQueue = new ArrayBlockingQueue<String>(1);
     public TheServer(int port){
@@ -137,6 +138,7 @@ public class TheServer {
         @Override
         public void run(){
             //This is where we will accept multiple clients and handle them.
+            Player myPlayer = null;
             try{
                 synchronized(lock){//Add this client's socket to out list of clients
                     clients.add(thesocket);
@@ -191,7 +193,7 @@ public class TheServer {
                     //initialize this class's player object and add it to the player queue
                     myPlayer = new Player(name);
                     playerQueue.put(myPlayer); 
-
+                    SecureRandom rand = new SecureRandom();//For picking a random card
                     while (!line.equals("Bye")) {//This is where you just write to the other clients, and not this client.
                         line = in.readUTF();
                         
@@ -203,9 +205,24 @@ public class TheServer {
                         //out.writeUTF(helper);//Don't output to the client what they just wrote.
                         writeToOtherClients(thesocket, helper);//Include another writetootherclients for the game here
                         //We only need to worry about the player object here, nothing else except making some dequeueing.
-                        //1. Check player's response
+                        //Pick a random card
+                        String gameOutput = "";
+                        int number = rand.nextInt(107);
+                        synchronized(gameLock){//Only one thread can access the game at a time
+                            gameOutput = game.getDeck().getValueAt(number).toString();
+                        }
+                        gameOutput = "Player " + name + ", this is your card: " + gameOutput;
+                        System.out.println(gameOutput);
+                        writeToOtherClients(thesocket, gameOutput);
                         //2. update this player's score
+                        if(line == "raise")
+                            myPlayer.add(game.getDeck().getValueAt(number).getNumber(), game.getDeck().getValueAt(number).getColor());
                         //3. check if win
+                        String pollAnswer = "";
+                            if((pollAnswer = ifWinQueue.poll()) != null){
+                                System.out.println(pollAnswer);
+                                writeToOtherClients(thesocket, pollAnswer);
+                            }
 
                     }
                     helper = "Connection over, " + name + " has left, goodbye.\n";
