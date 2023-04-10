@@ -180,11 +180,17 @@ public class TheServer {
                     synchronized(lock2){//Add name to list of client names
                         client_names.add(name);
                     }
+
+
                     //We could also add something here later that makes sure that each user name is unique.
                     helper = "Hi " + name + ", and welcome to the chat server\nType Bye when you want to leave.\n";
                     System.out.print(helper);
                     writeToOtherClients(thesocket, helper);//Let the other clients know of who just joined the server
                     out.writeUTF(helper);
+
+                    //initialize this class's player object and add it to the player queue
+                    myPlayer = new Player(name);
+                    playerQueue.put(myPlayer); 
 
                     while (!line.equals("Bye")) {//This is where you just write to the other clients, and not this client.
                         line = in.readUTF();
@@ -195,7 +201,12 @@ public class TheServer {
                         helper = name + ":" + " " + line + "\n";
                         System.out.print(helper);//output from server
                         //out.writeUTF(helper);//Don't output to the client what they just wrote.
-                        writeToOtherClients(thesocket, helper);
+                        writeToOtherClients(thesocket, helper);//Include another writetootherclients for the game here
+                        //We only need to worry about the player object here, nothing else except making some dequeueing.
+                        //1. Check player's response
+                        //2. update this player's score
+                        //3. check if win
+
                     }
                     helper = "Connection over, " + name + " has left, goodbye.\n";
                     System.out.print(helper);
