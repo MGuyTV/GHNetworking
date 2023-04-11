@@ -224,9 +224,9 @@ public class TheServer {
                         out.writeUTF(gameOutput);
                         //2. update this player's score
                         if(line == "raise")
+                            System.out.println("we did it!");
                             synchronized(gameLock){
                                 myPlayer.add(game.getDeck().getValueAt(number).getNumber(), game.getDeck().getValueAt(number).getColor());
-
                             //3. check if win
                             String pollAnswer = "";
                                 if((pollAnswer = ifWinQueue.poll()) != null){
@@ -287,11 +287,12 @@ public class TheServer {
                     }
 
                 }
+                //syst
                 while(true){//true until there is a winner
                     
                         
                         synchronized(gameLock){//We should output checkwincondition into another variable
-                            if(game.checkWinCondition(player1, player2) != "No winner yet\n"){//If there was a winner
+                            if(game.checkWinCondition(player1, player2) != "No winner yet"){//If there was a winner
                                 ifWinQueue.put(game.checkWinCondition(player1, player2));//Only one player's server needs to
                                                                                          //broadcast this message
                                 break;
