@@ -30,6 +30,7 @@ public class TheServer {
     private static Object lock2 = new Object();
     private boolean bool = false;
     private static Game game;
+    private static GameHandler gameHandler;
    // private Player myPlayer;//This player's player object
     private static ArrayBlockingQueue<Player> playerQueue = new ArrayBlockingQueue<Player>(2);
     private static ArrayBlockingQueue<String> ifWinQueue = new ArrayBlockingQueue<String>(1);
@@ -39,7 +40,11 @@ public class TheServer {
             System.out.println("Server started");
             System.out.println("Waiting client");
             /*****************************/
-
+            //Make gameHandler:
+            gameHandler = new GameHandler();
+            Thread mainThread = new Thread(gameHandler);
+            mainThread.start();//This will run in the background as the application runs
+            /*****************************/
             while(!server.isClosed()){
                 /*if(checkState()){//for now just let run forever and focus on getting the client output from the server.
                     System.out.println("Server Closed");
@@ -209,19 +214,25 @@ public class TheServer {
                         String gameOutput = "";
                         int number = rand.nextInt(107);
                         synchronized(gameLock){//Only one thread can access the game at a time
+                            //System.out.println("in the synchronized block.");
                             gameOutput = game.getDeck().getValueAt(number).toString();
                         }
-                        gameOutput = "Player " + name + ", this is your card: " + gameOutput;
-                        System.out.println(gameOutput);
+                      //  System.out.println("Out of the synchronized block.");
+                        gameOutput = "Player " + name + ", this is your card: " + gameOutput + "\n";
+                        System.out.print(gameOutput);
                         writeToOtherClients(thesocket, gameOutput);
+                        out.writeUTF(gameOutput);
                         //2. update this player's score
                         if(line == "raise")
-                            myPlayer.add(game.getDeck().getValueAt(number).getNumber(), game.getDeck().getValueAt(number).getColor());
-                        //3. check if win
-                        String pollAnswer = "";
-                            if((pollAnswer = ifWinQueue.poll()) != null){
-                                System.out.println(pollAnswer);
-                                writeToOtherClients(thesocket, pollAnswer);
+                            synchronized(gameLock){
+                                myPlayer.add(game.getDeck().getValueAt(number).getNumber(), game.getDeck().getValueAt(number).getColor());
+
+                            //3. check if win
+                            String pollAnswer = "";
+                                if((pollAnswer = ifWinQueue.poll()) != null){
+                                    System.out.println(pollAnswer);
+                                    writeToOtherClients(thesocket, pollAnswer);
+                                }
                             }
 
                     }
@@ -258,38 +269,54 @@ public class TheServer {
 
     }
 
-    public static void main(String args[]) 
-    { 
-        try{
-            TheServer server = new TheServer(Integer.parseInt(args[0]));//Port number is given by a comman line argument
-            //there should be a game instance variable, and you should construct and call the game here
-            Player player1 = null;
-            Player player2 = null;
-
-            while(true){//true until there is a winner
-                if(playerQueue.size() == 2){//Wait until both players have enqueued their player objects into the playerQueue
+    public class GameHandler implements Runnable{
+        Player player1 = null;
+        Player player2 = null;
+        @Override
+        public void run(){
+            try{
+                while(true){//run till this is true to get to the next part
                     synchronized(gameLock){
-                        player1 = playerQueue.take();
-                        player2 = playerQueue.take();
-                        game = new Game(player1, player2);
-
-                    }
-                    
-                    synchronized(gameLock){//We should output checkwincondition into another variable
-                        if(game.checkWinCondition(player1, player2) != "No winner yet"){//If there was a winner
-                            ifWinQueue.put(game.checkWinCondition(player1, player2));//Only one player's server needs to
-                                                                                     //broadcast this message
+                        if(playerQueue.size() == 2){
+                            player1 = playerQueue.take();
+                            player2 = playerQueue.take();
+                            game = new Game(player1, player2);
                             break;
-                        }
 
+                        }
                     }
+
+                }
+                while(true){//true until there is a winner
+                    
+                        
+                        synchronized(gameLock){//We should output checkwincondition into another variable
+                            if(game.checkWinCondition(player1, player2) != "No winner yet\n"){//If there was a winner
+                                ifWinQueue.put(game.checkWinCondition(player1, player2));//Only one player's server needs to
+                                                                                         //broadcast this message
+                                break;
+                            }
+
+                        }
+                    
+
                 }
 
+            }catch(Exception e){
+                e.printStackTrace();
             }
 
-        }catch(Exception e){
-            e.printStackTrace();
         }
+    }
+
+    public static void main(String args[]) 
+    { 
+        
+        TheServer server = new TheServer(Integer.parseInt(args[0]));//Port number is given by a comman line argument
+        //there should be a game instance variable, and you should construct and call the game here
+
+           
+       
 
         
     }
