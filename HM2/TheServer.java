@@ -232,6 +232,7 @@ public class TheServer {
                                 if((pollAnswer = ifWinQueue.poll()) != null){
                                     System.out.println(pollAnswer);
                                     writeToOtherClients(thesocket, pollAnswer);
+                                    out.writeUTF(pollAnswer);
                                 }
                             }
 

@@ -24,11 +24,17 @@ public class Game{
 	}
 
 	public String checkWinCondition(Player player1, Player player2){//Will return the outcome of the game in a string
+			String winString = 	   "_____.___.               __      __            ._.\n";
+			winString +=		   "\\__  |   | ____  __ __  /  \\    /  \\____   ____| |\n";
+			winString +=		   " /   |   |/  _ \\|  |  \\ \\   \\/\\/   /  _ \\ /    \\ |\n";
+			winString +=		   " \\____   (  <_> )  |  /  \\        (  <_> )   |  \\|\n";
+			winString +=		   " / ______|\\____/|____/    \\__/\\  / \\____/|___|  /_\n";
+			winString +=		   " \\/                            \\/             \\/\\/\n";
 
 			if(player1.getScore() >= 21)
-				return "Player 1 wins!";//Do it like this so the server can directly get the output of who wins.
+				return "Player 1 wins!\n" + winString;//Do it like this so the server can directly get the output of who wins.
 			if(player2.getScore() >= 21)
-				return "Player 2 wins!";
+				return "Player 2 wins!\n" + winString;
 			return "No winner yet";
 
 	
